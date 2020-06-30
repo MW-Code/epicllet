@@ -1,0 +1,45 @@
+// app global css in SCSS form
+body {
+  background: $secondary;
+  // overflow: hidden;
+}
+
+.anima-all-ease {
+  transition: all 0.5s ease;
+}
+.anima-all-ease-fast {
+  transition: all 0.2s ease;
+}
+
+.anima-all-ease-slow {
+  transition: all 1s ease;
+}
+
+.bg-animation {
+  background: linear-gradient(
+    104deg,
+    $secondary,
+    yellow,
+    $accent,
+    yellow,
+    $accent,
+    yellow,
+    $accent,
+    $secondary
+  );
+  background-size: 600% 600%;
+
+  animation: sloweasebganimation 13s ease infinite;
+}
+
+@keyframes sloweasebganimation {
+  0% {
+    background-position: 93% 0%;
+  }
+  50% {
+    background-position: 0% 100%;
+  }
+  100% {
+    background-position: 93% 0%;
+  }
+}
