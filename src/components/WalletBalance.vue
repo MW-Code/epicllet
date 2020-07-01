@@ -1,9 +1,7 @@
 <template>
   <div
     class=" anima-all-ease-fast bg-animation text-secondary row items-center justify-center"
-    style="height: 30vh;
-    width: 100%;
-   "
+    style="height: 30vh; width:100%;"
     :class="{ newWalletBG: fsBG, roundedBG: !fsBG }"
   >
     <WalletBtn
@@ -102,11 +100,6 @@ export default {
 </script>
 
 <style lang="scss">
-.roundedBG {
-  margin: 17px;
-  border-radius: 30px;
-}
-
 .newWallet {
   width: 90vw;
   max-width: 500px;

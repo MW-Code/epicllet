@@ -7,7 +7,7 @@ export function UpdateUserProfil(state, newUserProfil) {
   state.userProfil = newUserProfil;
 }
 export function ClearUserProfil(state) {
-  state.userProfil = [];
+  state.userProfil = null;
 }
 
 export function InitFirebase(state, newFirebaseApp) {

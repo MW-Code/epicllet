@@ -19,48 +19,59 @@ export const InitFirebase = ({ commit, dispatch }, router) => {
   accountsCollection = db.collection("accounts");
   walletCollection = db.collection("wallets");
 
-  auth.onAuthStateChanged(user => {
+  auth.onAuthStateChanged(async user => {
     if (!user) {
       // Kein User eingelogt
       OpenInternLink(router, "/signx");
     } else {
       // User Login erkannt
       // lade User Profil
-      dispatch("LoadUserProfil").then(userRes => {
-        //lade Wallets
-        dispatch("WalletLoad").then(walletRes => {
-          // link zum Dashboard
-          OpenInternLink(router, "/dashboard");
-        });
+      await dispatch("LoadUserProfil");
+      await dispatch("WalletLoad").then(walletRes => {
+        // link zum Dashboard
+        OpenInternLink(router, "/dashboard");
       });
+      //lade Wallets
     }
   });
 };
 
-export const UserSignOut = ({ commit }) => {
-  if (state.auth.currentUser === undefined) return false;
-  const uid = state.auth.currentUser.uid;
-
-  console.log("FETCH USER PROFILE", uid);
-  accountsCollection
-    .doc(uid)
-    .get()
-    .then(doc => {
-      if (doc.exists) {
-        // console.log(doc, doc.data(), doc.id);
-        const userObj = {
-          username: doc.data().username,
-          usermail: doc.data().usermail,
-          newsletter: doc.data().newsletter,
-          uid: doc.id
-        };
-        commit("UpdateUserProfil", userObj);
-      } else {
-        console.log("Keine Profil infos für ", uid);
-      }
+export const UserSignIn = ({ dispatch }, payload) => {
+  auth
+    .signInWithEmailAndPassword(payload.usermail, payload.password)
+    // .then(user => {
+    //   dispatch("LoadUserProfil", user.uid);
+    //   // this.$router.push("/dashboard");
+    // })
+    .catch(err => {
+      console.log(err);
+    });
+};
+export const UserSignUp = async ({ commit, dispatch }, payload) => {
+  return auth
+    .createUserWithEmailAndPassword(payload.usermail, payload.password)
+    .then(fbuser => {
+      const user = fbuser.user;
+      const uid = user.uid;
+      console.log("USER PROFIL Speichern");
+      return uid;
     })
     .catch(err => {
       console.log(err);
+      return false;
+    });
+};
+
+export const UserSignOut = ({ commit }) => {
+  auth
+    .signOut()
+    .then(function() {
+      // Sign-out successful.
+      commit("ClearUserProfil");
+    })
+    .catch(function(error) {
+      // An error happened.
+      console.log("Fehler beim ausloggen", error);
     });
 };
 export const LoadUserProfil = ({ commit }) => {
@@ -92,7 +103,7 @@ export const LoadUserProfil = ({ commit }) => {
 };
 
 export const SaveUserProfil = ({ commit }, payload) => {
-  console.log("Safe USER PROFILE", payload);
+  console.log("SAFE USER PROFILE", payload);
   accountsCollection
     .doc(payload.uid)
     .set({
@@ -100,22 +111,22 @@ export const SaveUserProfil = ({ commit }, payload) => {
       usermail: payload.usermail,
       newsletter: payload.newsletter
     })
-    .then(() => {
-      commit("setUserProfil", {
-        username: payload.username,
-        usermail: payload.usermail,
-        newsletter: payload.newsletter,
-        uid: payload.uid
-      });
-    })
+    // .then(() => {
+    //   commit("UpdateUserProfil", {
+    //     username: payload.username,
+    //     usermail: payload.usermail,
+    //     newsletter: payload.newsletter,
+    //     uid: payload.uid
+    //   });
+    // })
     .catch(err => {
       console.log(err);
     });
 };
 
 export const WalletLoad = ({ commit }) => {
-  console.log("START WALLET LOAD");
   const uid = auth.currentUser.uid;
+  console.log("START WALLET LOAD", uid);
   walletCollection.where("userList", "array-contains", uid);
   walletCollection.where("owner", "==", uid);
   walletCollection.get().then(snapshot => {
