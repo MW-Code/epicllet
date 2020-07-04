@@ -1,7 +1,7 @@
 <template>
   <q-page class="bg-secondary no-border text-white  ">
     <div
-      class="roundedBG bg-animation text-secondary row items-center justify-center"
+      class="rounded bg-animation text-secondary row items-center justify-center"
       style="height: 25vh"
     >
       <q-btn

@@ -26,6 +26,7 @@ export const InitFirebase = ({ commit, dispatch }, router) => {
     } else {
       // User Login erkannt
       // lade User Profil
+
       await dispatch("LoadUserProfil");
       await dispatch("WalletLoad").then(walletRes => {
         // link zum Dashboard
@@ -67,6 +68,7 @@ export const UserSignOut = ({ commit }) => {
     .signOut()
     .then(function() {
       // Sign-out successful.
+      commit("ClearWallets");
       commit("ClearUserProfil");
     })
     .catch(function(error) {
@@ -127,6 +129,7 @@ export const SaveUserProfil = ({ commit }, payload) => {
 export const WalletLoad = ({ commit }) => {
   const uid = auth.currentUser.uid;
   console.log("START WALLET LOAD", uid);
+
   walletCollection.where("userList", "array-contains", uid);
   walletCollection.where("owner", "==", uid);
   walletCollection.get().then(snapshot => {
@@ -135,11 +138,13 @@ export const WalletLoad = ({ commit }) => {
       commit("ClearWallets");
       return null;
     } else {
+      commit("ClearWallets");
       snapshot.forEach(doc => {
         const walletObj = {
           id: doc.id,
           ...doc.data()
         };
+
         commit("AddWallet", walletObj);
       });
     }

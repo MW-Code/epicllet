@@ -1,18 +1,35 @@
 <template>
   <div
-    class="text-nowarp roundBTN base anima-all-ease shadow-10 text-weight-light text-h4 q-pa-lg row justify-center items-center"
-    :class="{ roundedBTN: mode === 'noWallet', dialogWallet: showDialog }"
+    class="text-nowarp  base anima-all-ease shadow-10 text-weight-light text-h4 q-pa-lg row justify-center items-center"
+    :class="{
+      roundedBTN: mode === 'newWallet',
+      dialogWallet: newWalletDialog.showDialog
+    }"
+    :style="[btnStyleHandler]"
   >
-    <div class="anima-all-ease" :class="{ titlelabel: headerRdy }">
+    <div
+      class="anima-all-ease"
+      :class="{ titlelabel: newWalletDialog.headerRdy }"
+    >
       <q-spinner-grid v-if="mode === 'load'" />
       <div v-else class="row no-wrap justify-center items-center n">
         <q-icon v-if="BuildIcon() !== ''" :name="BuildIcon()" />
-        <p v-if="BuildLabelText() !== ''" class=" q-ma-none q-pa-none">
-          {{ BuildLabelText() }}
-        </p>
+        <transition
+          appear
+          enter-active-class="animated fadeIn"
+          leave-active-class="animated fadeOut"
+        >
+          <p
+            v-show="showLabel"
+            v-if="BuildLabelText() !== ''"
+            class=" q-ma-none q-pa-none"
+          >
+            {{ BuildLabelText() }}
+          </p>
+        </transition>
       </div>
     </div>
-    <div v-if="dialogRdy">
+    <div v-if="newWalletDialog.dialogRdy">
       <transition
         appear
         enter-active-class="animated fadeIn"
@@ -20,11 +37,11 @@
       >
         <div>
           <p class="q-my-lg text-body1">Erstelle jetzt deine erste Wallet</p>
-          <q-form @submit="SaveWallet()">
+          <q-form @submit="EmitSaveWallet()">
             <q-input
               class="q-my-md text-white"
               standout="bg-accent text-black"
-              v-model="title"
+              v-model="newWallet.title"
               type="text"
               dark
               label="Name"
@@ -32,7 +49,7 @@
             <q-input
               class="q-my-md text-white"
               standout="bg-accent text-black"
-              v-model="currency"
+              v-model="newWallet.currency"
               type="text"
               dark
               label="Währung"
@@ -40,7 +57,7 @@
             <q-input
               class="q-my-md text-white"
               standout="bg-accent text-black"
-              v-model="info"
+              v-model="newWallet.info"
               type="text"
               dark
               label="Info"
@@ -49,7 +66,7 @@
               no-caps
               class=" full-width q-mt-md bg-accent text-secondary"
               size="lg"
-              :disable="title === '' || currency === ''"
+              :disable="newWallet.title === '' || newWallet.currency === ''"
               label="Wallet erstellen"
               type="submit"
             />
@@ -69,54 +86,78 @@
 <script>
 export default {
   // name: 'ComponentName',
-  props: ["mode", "balance"],
+  props: ["mode", "wallet"],
   data() {
     return {
-      showDialog: false,
-      headerRdy: false,
-      dialogRdy: false,
-      title: "Mein Konto",
-      info: "",
-      currency: "€"
+      showLabel: false,
+      btnStyleHandler: {
+        width: "100px",
+        height: "100px",
+        maxWidth: "280px"
+      },
+      newWallet: {
+        title: "Mein Konto",
+        info: "",
+        currency: "€"
+      },
+      newWalletDialog: {
+        showDialog: false,
+        headerRdy: false,
+        dialogRdy: false
+      }
     };
   },
   methods: {
-    SaveWallet() {
-      console.log("Starte Save Wallet");
-
-      this.headerRdy = false;
-      this.dialogRdy = false;
-      this.showDialog = false;
+    EmitSaveWallet() {
       this.$emit("SaveWallet", {
-        title: this.title,
-        currency: this.currency,
-        info: this.info
+        title: this.newWallet.title,
+        currency: this.newWallet.currency,
+        info: this.newWallet.info
       });
     },
-    ShowDialog() {
-      console.log("show Dialoig ya");
-      this.showDialog = true;
+    ShowNewWalletDialog() {
+      this.newWalletDialog.showDialog = true;
       setTimeout(() => {
-        this.headerRdy = true;
+        this.newWalletDialog.headerRdy = true;
         setTimeout(() => {
-          this.dialogRdy = true;
+          this.newWalletDialog.dialogRdy = true;
         }, 300);
       }, 100);
     },
+    HideNewWalletDialog() {
+      this.newWalletDialog.headerRdy = false;
+      this.newWalletDialog.dialogRdy = false;
+      this.newWalletDialog.showDialog = false;
+    },
     BuildIcon() {
       if (this.mode === "add") return "add";
-      if (this.mode === "noWallet") return "add";
+      if (this.mode === "newWallet") return "add";
       if (this.mode === "remove") return "add";
 
       return "";
     },
     BuildLabelText() {
-      if (this.mode === "idle")
-        return this.balance.toLocaleString() + "" + this.balanceName;
-      if (this.mode === "add") return "+";
-      if (this.mode === "remove") return "-";
+      if (this.mode === "addWallet" || this.wallet === undefined) {
+        setTimeout(() => {
+          this.showLabel = true;
+        }, 200);
+        return "Wallet";
+      }
+      if (this.mode === "idle" && this.wallet !== undefined);
+      {
+        const labelSize =
+          (this.wallet.balance.toLocaleString() + " " + this.wallet.currency)
+            .length * 26;
+        this.btnStyleHandler.width = labelSize + 20 + "px";
+        setTimeout(() => {
+          this.showLabel = true;
+        }, 200);
+
+        return (
+          this.wallet.balance.toLocaleString() + " " + this.wallet.currency
+        );
+      }
       if (this.mode === "load") return "";
-      if (this.mode === "noWallet") return "Wallet";
     }
   }
 };
@@ -135,21 +176,22 @@ export default {
   margin: 20px;
 }
 
+.roundBTN {
+  width: 100px;
+}
+.roundedBTN {
+  max-width: 280px !important;
+  max-height: 100px;
+  width: 100% !important;
+  height: 100%;
+}
+
 .titlelabel {
   position: absolute;
   transition: all 0.4s ease;
   transform: translateY(-230px);
 }
 
-.roundBTN {
-  width: 100px;
-}
-.roundedBTN {
-  max-width: 400px !important;
-  max-height: 100px;
-  width: 100% !important;
-  height: 100%;
-}
 .dialogWallet {
   max-width: 90vw !important;
   max-height: 60vh !important;

@@ -1,16 +1,16 @@
 <template>
   <div
     class=" anima-all-ease-fast bg-animation text-secondary row items-center justify-center"
-    style="height: 30vh; width:100%;"
-    :class="{ newWalletBG: fsBG, roundedBG: !fsBG }"
+    style=" width:100%;"
+    :class="{ newWalletBG: fsBG, rounded: !fsBG }"
   >
     <WalletBtn
-      style="max-width:400px !important"
       :mode="mode"
       :wallet="wallet"
       ref="WalletBtnDialog"
       @SaveWallet="SaveWallet"
     />
+    {{ this.mode }}
   </div>
 </template>
 
@@ -25,39 +25,39 @@ export default {
   data() {
     return {
       mode: "load",
-      balance: 0,
-      balanceName: "€",
       addwallet: false,
       fsBG: false,
-      walletname: "",
       wallet: {}
     };
   },
   methods: {
-    SetupWallet() {
+    SetupWalletBtn() {
       this.mode = "load";
       this.fsBG = false;
-      if (this.wallet === []) return;
-      console.log("in balan", this.wallet);
+
       if (this.wallet === undefined) {
-        // this.mode = "load";
+        console.log("WALLET nicht GEFUNDEN", this.wallet);
         setTimeout(() => {
-          this.mode = "noWallet";
+          this.mode = "newWallet";
           this.fsBG = true;
           setTimeout(() => {
-            this.$refs.WalletBtnDialog.ShowDialog();
+            if (this.$refs.WalletBtnDialog !== undefined)
+              this.$refs.WalletBtnDialog.ShowNewWalletDialog();
           }, 400);
-          // this.ShowNewWallet();
         }, 500);
+      } else {
+        console.log("WALLET GEFUNDEN", this.wallet);
+        this.mode = "idle";
       }
     },
     UpdateWallet(newWallet) {
-      console.log("Update Wallet Stuff", newWallet);
+      console.log("UpdateWallet in Balance", newWallet, this.mode);
       this.wallet = newWallet;
-      this.SetupWallet();
+      this.SetupWalletBtn();
     },
     SaveWallet(payload) {
       console.log("Save Wallet Emit", payload);
+      this.$refs.WalletBtnDialog.HideNewWalletDialog();
       this.mode = "load";
       this.fsBG = false;
       this.addwallet = false;
@@ -74,16 +74,6 @@ export default {
     ShowNewWallet() {
       this.addwallet = !this.addwallet;
       this.fsBG = !this.fsBG;
-    },
-    BuildLabelText() {
-      if (this.walletPool.length > 0) this.mode = "noWallet";
-
-      if (this.mode === "idle")
-        return this.balance.toLocaleString() + "" + this.balanceName;
-      if (this.mode === "add") return "+";
-      if (this.mode === "remove") return "-";
-      if (this.mode === "load") return "";
-      if (this.mode === "noWallet") return "Wallet";
     }
   }
 
@@ -93,9 +83,6 @@ export default {
   //     return this.$store.getters["WalletPool"];
   //   }
   // },
-  // mounted() {
-  //   this.Setup();
-  // }
 };
 </script>
 

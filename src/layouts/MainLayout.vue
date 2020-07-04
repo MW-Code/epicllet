@@ -14,7 +14,7 @@
           dense
           round
           icon="menu"
-          aria-label="login"
+          aria-label="menu"
           @click="leftDrawerOpen = !leftDrawerOpen"
         />
       </q-toolbar>
@@ -31,12 +31,24 @@
           class="row justify-between item-center q-ma-md text-h6 text-accent text-weight-light"
         >
           Hallo {{ UserProfil.username }}
+          <q-space />
           <q-btn
             @click="UserSignOut()"
             round
             dense
+            aria-label="signOff"
             icon="power_settings_new"
             flat
+          />
+
+          <q-btn
+            class="q-mx-xs"
+            flat
+            dense
+            round
+            icon="account_circle"
+            aria-label="profil"
+            @click="leftDrawerOpen = !leftDrawerOpen"
           />
         </div>
 
@@ -49,7 +61,9 @@
             <q-btn round icon="add" flat />
           </q-item-label>
 
-          <q-item v-for="wallet in WalletPool" :key="wallet.title"> </q-item>
+          <q-item v-for="wallet in WalletPool" :key="wallet.id">
+            {{ wallet.title }}
+          </q-item>
         </q-list>
         <div v-else class=" full-width text-center q-pa-md">
           <p class="text-body1 q-ma-none">Noch keine Konten gefunden.</p>
