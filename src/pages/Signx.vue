@@ -1,5 +1,5 @@
 <template>
-  <q-page class="bg-secondary no-border text-white  ">
+  <q-page class="fullPage bg-secondary no-border text-white  ">
     <div
       class="rounded bg-animation text-secondary row items-center justify-center"
       style="height: 25vh"

@@ -9,6 +9,17 @@
         />
         <q-space />
         <q-btn
+          v-if="IsDialog"
+          class="q-mx-xs"
+          flat
+          dense
+          round
+          icon="close"
+          aria-label="close"
+          @click="CloseDialog()"
+        />
+        <q-btn
+          v-if="!IsDialog"
           class="q-mx-xs"
           flat
           dense
@@ -52,24 +63,46 @@
           />
         </div>
 
-        <q-list v-if="WalletPool.length > 0">
+        <q-list class="q-pt-md" v-if="WalletPool.length > 0">
           <q-item-label
             header
-            class="  row justify-between items-center text-grey-8"
+            class="q-my-none q-py-none text-h6  row justify-between items-center text-grey-8"
           >
-            Konten
-            <q-btn round icon="add" flat />
+            Wallets
+            <q-btn
+              class="text-accent"
+              round
+              icon="add"
+              @click="OpenNewWalletDialog()"
+              flat
+            />
           </q-item-label>
 
-          <q-item v-for="wallet in WalletPool" :key="wallet.id">
-            {{ wallet.title }}
+          <q-item
+            @click.native="OpenWallet(wallet.id)"
+            class="walletListbtn bg-accent text-black"
+            :style="{ opacity: wallet !== Wallet ? '0.6' : '1' }"
+            v-for="wallet in WalletPool"
+            :key="wallet.id"
+          >
+            <q-item-section>
+              <q-item-label> {{ wallet.title }}</q-item-label>
+              <q-item-label v-if="wallet.info !== ''" caption lines="1">{{
+                wallet.info
+              }}</q-item-label>
+            </q-item-section>
+            <q-item-section avatar>
+              4k €
+              <!-- <q-icon name="chat_bubble" color="primary" /> -->
+            </q-item-section>
           </q-item>
         </q-list>
         <div v-else class=" full-width text-center q-pa-md">
           <p class="text-body1 q-ma-none">Noch keine Konten gefunden.</p>
           <q-btn
             class=" full-width q-mt-md"
-            label="Neues Konto anlegen"
+            label="Neues Wallet anlegen"
+            @click="OpenNewWalletDialog()"
             icon="add"
             flat
           />
@@ -94,6 +127,12 @@ export default {
     };
   },
   computed: {
+    IsDialog() {
+      return this.$store.getters["IsDialog"];
+    },
+    Wallet() {
+      return this.$store.getters["Wallet"];
+    },
     WalletPool() {
       return this.$store.getters["WalletPool"];
     },
@@ -102,8 +141,22 @@ export default {
     }
   },
   methods: {
+    CloseDialog() {
+      this.$store.commit("UpdateMode", "Idle");
+    },
     UserSignOut() {
       this.$store.dispatch("UserSignOut");
+    },
+    OpenNewWalletDialog() {
+      this.leftDrawerOpen = false;
+      this.$store.commit("UpdateMode", "AddWallet");
+    },
+    OpenWallet(id) {
+      if (this.Wallet.id !== id) {
+        this.$store.commit("SelectWallet", id);
+
+        this.leftDrawerOpen = false;
+      }
     }
   }
 };

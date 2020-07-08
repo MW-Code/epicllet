@@ -15,6 +15,15 @@ export function InitFirebase(state, newFirebaseApp) {
   state.firebase = newFirebaseApp;
 }
 
+export function UpdateMode(state, newMode) {
+  if (newMode === "AddWallet") {
+    state.isDialog = true;
+  } else {
+    state.isDialog = false;
+  }
+  state.mode = newMode;
+}
+
 export function AddWallet(state, newWalletObj) {
   if (!find(state.walletPool, { id: newWalletObj.id })) {
     state.walletPool.push(newWalletObj);
@@ -23,8 +32,10 @@ export function AddWallet(state, newWalletObj) {
 }
 
 export function SelectWallet(state, id) {
+  state.mode = "Load";
   if (id === undefined || id === -1) state.walletPointer = 0;
   state.walletPointer = findIndex(state.walletPool, o => {
+    state.mode = "Idle";
     return o.id === id;
   });
 

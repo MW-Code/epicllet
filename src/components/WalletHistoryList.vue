@@ -29,11 +29,7 @@
     <div>
       <transition-group name="card" tag="section">
         >
-        <section
-          class="card"
-          v-for="(item, index) in FilterWalletList"
-          :key="index"
-        >
+        <section class="card" v-for="item in FilterWalletList" :key="item.id">
           <HistoryItem :HistoryItem="item" />
         </section>
       </transition-group>
@@ -56,6 +52,13 @@ export default {
     };
   },
   computed: {
+    Mode() {
+      return this.$store.getters["Mode"];
+    },
+    Wallet() {
+      // console.log(this.$store.getters["WalletPool"]);
+      return this.$store.getters["Wallet"];
+    },
     FilterWalletList() {
       var vm = this;
       if (this.historyPool[0] === undefined) return;
@@ -66,15 +69,19 @@ export default {
   },
   methods: {
     LoadHistoryItems(walletID) {
-      this.historyPool = [{ title: "muh" }, { title: "lol" }, { title: "mäh" }];
-    },
-    UpdateWallet(newWallet) {
-      console.log("UpdateWallet in HistList", newWallet);
-      if (newWallet !== undefined) {
-        this.wallet = newWallet;
-        this.LoadHistoryItems(this.wallet.id);
-      }
+      this.historyPool = [
+        { title: "muh", id: "01" },
+        { title: "lol", id: "02" },
+        { title: "mäh", id: "03" }
+      ];
     }
+    // UpdateWallet(newWallet) {
+    //   console.log("UpdateWallet in HistList", newWallet);
+    //   if (newWallet !== undefined) {
+    //     this.wallet = newWallet;
+    //     this.LoadHistoryItems(this.wallet.id);
+    //   }
+    // }
   }
 };
 </script>

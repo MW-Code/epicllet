@@ -136,6 +136,7 @@ export const WalletLoad = ({ commit }) => {
     if (snapshot.empty) {
       // keine Wallets gefunden
       commit("ClearWallets");
+      commit("UpdateMode", "AddWallet");
       return null;
     } else {
       commit("ClearWallets");
@@ -146,13 +147,16 @@ export const WalletLoad = ({ commit }) => {
         };
 
         commit("AddWallet", walletObj);
+        commit("SelectWallet", doc.id);
+        commit("UpdateMode", "Idle");
       });
     }
   });
 };
 
-export const WalletSave = ({ dispatch }, payload) => {
+export const WalletSave = ({ dispatch, commit }, payload) => {
   console.log("Wallet Save Aktion", payload);
+  commit("UpdateMode", "Load");
   const uid = auth.currentUser.uid;
   const walletObj = {
     title: payload.title,

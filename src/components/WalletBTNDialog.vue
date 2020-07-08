@@ -1,17 +1,14 @@
 <template>
   <div
-    class="text-nowarp  base anima-all-ease shadow-10 text-weight-light text-h4 q-pa-lg row justify-center items-center"
+    class="text-nowarp  base anima-all-ease-fast shadow-10 text-weight-light text-h4 q-pa-lg row justify-center items-center"
     :class="{
-      roundedBTN: mode === 'newWallet',
-      dialogWallet: newWalletDialog.showDialog
+      roundedBTN: Mode === 'AddWallet',
+      dialogWallet: Mode === 'AddWallet'
     }"
     :style="[btnStyleHandler]"
   >
-    <div
-      class="anima-all-ease"
-      :class="{ titlelabel: newWalletDialog.headerRdy }"
-    >
-      <q-spinner-grid v-if="mode === 'load'" />
+    <div class="anima-all-ease" :class="{ titlelabel: Mode === 'AddWallet' }">
+      <q-spinner-grid v-if="Mode === 'Load'" />
       <div v-else class="row no-wrap justify-center items-center n">
         <q-icon v-if="BuildIcon() !== ''" :name="BuildIcon()" />
         <transition
@@ -29,64 +26,67 @@
         </transition>
       </div>
     </div>
-    <div v-if="newWalletDialog.dialogRdy">
-      <transition
-        appear
-        enter-active-class="animated fadeIn"
-        leave-active-class="animated fadeOut"
-      >
-        <div>
-          <p class="q-my-lg text-body1">Erstelle jetzt deine erste Wallet</p>
-          <q-form @submit="EmitSaveWallet()">
-            <q-input
-              class="q-my-md text-white"
-              standout="bg-accent text-black"
-              v-model="newWallet.title"
-              type="text"
-              dark
-              label="Name"
-            />
-            <q-input
-              class="q-my-md text-white"
-              standout="bg-accent text-black"
-              v-model="newWallet.currency"
-              type="text"
-              dark
-              label="Währung"
-            />
-            <q-input
-              class="q-my-md text-white"
-              standout="bg-accent text-black"
-              v-model="newWallet.info"
-              type="text"
-              dark
-              label="Info"
-            />
-            <q-btn
-              no-caps
-              class=" full-width q-mt-md bg-accent text-secondary"
-              size="lg"
-              :disable="newWallet.title === '' || newWallet.currency === ''"
-              label="Wallet erstellen"
-              type="submit"
-            />
-            <q-btn
-              flat
-              class="full-width q-mt-md text-white"
-              size="md"
-              label="Abbrechen"
-            />
-          </q-form>
-        </div>
-      </transition>
-    </div>
+    <!-- <div > -->
+    <transition
+      v-if="newWalletDialog.dialogContent"
+      appear
+      enter-active-class="animated fadeIn"
+      leave-active-class="animated
+      fadeOut"
+    >
+      <div>
+        <p class="q-my-lg text-body1">Erstelle jetzt deine erste Wallet</p>
+        <q-form @submit="EmitSaveWallet()">
+          <q-input
+            class="q-my-md text-white"
+            standout="bg-accent text-black"
+            v-model="newWallet.title"
+            type="text"
+            dark
+            label="Name"
+          />
+          <q-input
+            class="q-my-md text-white"
+            standout="bg-accent text-black"
+            v-model="newWallet.currency"
+            type="text"
+            dark
+            label="Währung"
+          />
+          <q-input
+            class="q-my-md text-white"
+            standout="bg-accent text-black"
+            v-model="newWallet.info"
+            type="text"
+            dark
+            label="Info"
+          />
+          <q-btn
+            no-caps
+            class=" full-width q-mt-md bg-accent text-secondary"
+            size="lg"
+            :disable="newWallet.title === '' || newWallet.currency === ''"
+            label="Wallet erstellen"
+            type="submit"
+          />
+          <q-btn
+            flat
+            @click="Cancel()"
+            class="full-width q-mt-md text-white"
+            size="md"
+            label="Abbrechen"
+          />
+        </q-form>
+      </div>
+    </transition>
+    <!-- </div> -->
   </div>
 </template>
 
 <script>
 export default {
   // name: 'ComponentName',
-  props: ["mode", "wallet"],
+  props: [],
   data() {
     return {
       showLabel: false,
@@ -100,14 +100,35 @@ export default {
         info: "",
         currency: "€"
       },
+
       newWalletDialog: {
-        showDialog: false,
-        headerRdy: false,
-        dialogRdy: false
+        // showDialog: false,
+        // headerRdy: false,
+        dialogContent: false // dialogRdy: this.Mode === "AddWallet" ? true : false
       }
     };
   },
+  watcher: {
+    Mode(n, o) {
+      console.log("watchers", n, o);
+    }
+  },
   methods: {
+    // GetDialogContent() {
+    //   return this.Mode === "AddWallet"
+    //     ? setTimeout(() => {
+    //         return true;
+    //       }, 100)
+    //     : setTimeout(() => {
+    //         return false;
+    //       }, 100);
+    // },
+    Cancel() {
+      // this.newWalletDialog.headerRdy = false;
+      this.newWalletDialog.dialogRdy = false;
+      // this.newWalletDialog.showDialog = false;
+      this.$store.commit("UpdateMode", "Idle");
+    },
     EmitSaveWallet() {
       this.$emit("SaveWallet", {
         title: this.newWallet.title,
@@ -116,13 +137,13 @@ export default {
       });
     },
     ShowNewWalletDialog() {
-      this.newWalletDialog.showDialog = true;
+      // // this.newWalletDialog.showDialog = true;
+      // setTimeout(() => {
+      //   // this.newWalletDialog.headerRdy = true;
       setTimeout(() => {
-        this.newWalletDialog.headerRdy = true;
-        setTimeout(() => {
-          this.newWalletDialog.dialogRdy = true;
-        }, 300);
-      }, 100);
+        this.newWalletDialog.dialogRdy = true;
+      }, 400);
+      // }, 100);
     },
     HideNewWalletDialog() {
       this.newWalletDialog.headerRdy = false;
@@ -130,23 +151,27 @@ export default {
       this.newWalletDialog.showDialog = false;
     },
     BuildIcon() {
-      if (this.mode === "add") return "add";
-      if (this.mode === "newWallet") return "add";
-      if (this.mode === "remove") return "add";
+      if (this.Mode === "add") return "add";
+      if (this.Mode === "AddWallet") return "add";
+      if (this.Mode === "remove") return "add";
 
       return "";
     },
     BuildLabelText() {
-      if (this.mode === "addWallet" || this.wallet === undefined) {
+      if (this.Mode === "AddWallet") {
         setTimeout(() => {
+          this.ShowNewWalletDialog();
           this.showLabel = true;
         }, 200);
         return "Wallet";
       }
-      if (this.mode === "idle" && this.wallet !== undefined);
-      {
+      if (
+        this.Mode === "Idle" &&
+        this.Wallet !== undefined &&
+        this.Wallet !== null
+      ) {
         const labelSize =
-          (this.wallet.balance.toLocaleString() + " " + this.wallet.currency)
+          (this.Wallet.balance.toLocaleString() + " " + this.Wallet.currency)
             .length * 26;
         this.btnStyleHandler.width = labelSize + 20 + "px";
         setTimeout(() => {
@@ -154,10 +179,19 @@ export default {
         }, 200);
 
         return (
-          this.wallet.balance.toLocaleString() + " " + this.wallet.currency
+          this.Wallet.balance.toLocaleString() + " " + this.Wallet.currency
         );
       }
-      if (this.mode === "load") return "";
+      if (this.Mode === "Load") return "";
+    }
+  },
+  computed: {
+    Mode() {
+      return this.$store.getters["Mode"];
+    },
+    Wallet() {
+      // console.log(this.$store.getters["WalletPool"]);
+      return this.$store.getters["Wallet"];
     }
   }
 };

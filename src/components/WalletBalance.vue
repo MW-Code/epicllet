@@ -2,15 +2,12 @@
   <div
     class=" anima-all-ease-fast bg-animation text-secondary row items-center justify-center"
     style=" width:100%;"
-    :class="{ newWalletBG: fsBG, rounded: !fsBG }"
+    :class="{
+      newWalletBG: Mode === 'AddWallet',
+      rounded: Mode !== 'AddWallet'
+    }"
   >
-    <WalletBtn
-      :mode="mode"
-      :wallet="wallet"
-      ref="WalletBtnDialog"
-      @SaveWallet="SaveWallet"
-    />
-    {{ this.mode }}
+    <WalletBtn ref="WalletBtnDialog" @SaveWallet="SaveWallet" />
   </div>
 </template>
 
@@ -24,43 +21,42 @@ export default {
   },
   data() {
     return {
-      mode: "load",
-      addwallet: false,
-      fsBG: false,
-      wallet: {}
+      // addwallet: false,
+      // fsBG: false
     };
   },
   methods: {
     SetupWalletBtn() {
-      this.mode = "load";
-      this.fsBG = false;
+      // this.$store.commit("UpdateMode", "Load");
+      // this.fsBG = false;
 
-      if (this.wallet === undefined) {
-        console.log("WALLET nicht GEFUNDEN", this.wallet);
+      if (this.Wallet === null || this.Wallet === undefined) {
+        console.log("WALLET nicht GEFUNDEN", this.Wallet);
         setTimeout(() => {
-          this.mode = "newWallet";
-          this.fsBG = true;
+          // this.$store.commit("UpdateMode", "AddWallet");
+          // this.fsBG = true;
           setTimeout(() => {
             if (this.$refs.WalletBtnDialog !== undefined)
               this.$refs.WalletBtnDialog.ShowNewWalletDialog();
           }, 400);
         }, 500);
       } else {
-        console.log("WALLET GEFUNDEN", this.wallet);
-        this.mode = "idle";
+        console.log("WALLET GEFUNDEN", this.Wallet);
+        this.$store.commit("UpdateMode", "Idle");
       }
     },
-    UpdateWallet(newWallet) {
-      console.log("UpdateWallet in Balance", newWallet, this.mode);
-      this.wallet = newWallet;
-      this.SetupWalletBtn();
-    },
+    // UpdateWallet(newWallet) {
+    //   console.log("UpdateWallet in Balance", newWallet, this.mode);
+    //   this.wallet = newWallet;
+    //   this.SetupWalletBtn();
+    // },
     SaveWallet(payload) {
       console.log("Save Wallet Emit", payload);
+
       this.$refs.WalletBtnDialog.HideNewWalletDialog();
-      this.mode = "load";
-      this.fsBG = false;
-      this.addwallet = false;
+
+      // this.fsBG = false;
+      // this.addwallet = false;
       this.$store
         .dispatch("WalletSave", {
           title: payload.title,
@@ -70,19 +66,21 @@ export default {
         .then(res => {
           console.log("then WalletSave", res);
         });
+    }
+    // ShowNewWallet() {
+    //   this.addwallet = !this.addwallet;
+    //   this.fsBG = !this.fsBG;
+    // }
+  },
+  computed: {
+    Wallet() {
+      // console.log(this.$store.getters["WalletPool"]);
+      return this.$store.getters["Wallet"];
     },
-    ShowNewWallet() {
-      this.addwallet = !this.addwallet;
-      this.fsBG = !this.fsBG;
+    Mode() {
+      return this.$store.getters["Mode"];
     }
   }
-
-  // computed: {
-  //   WalletPool() {
-  //     console.log(this.$store.getters["WalletPool"]);
-  //     return this.$store.getters["WalletPool"];
-  //   }
-  // },
 };
 </script>
 

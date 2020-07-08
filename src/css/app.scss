@@ -4,6 +4,11 @@ body {
   // overflow: hidden;
 }
 
+.fullPage {
+  // bugfix scrollbar
+  min-height: 0 !important;
+}
+
 .anima-all-ease {
   transition: all 0.5s ease;
 }
@@ -47,4 +52,10 @@ body {
 .rounded {
   margin: 17px;
   border-radius: 30px;
+}
+
+.walletListbtn {
+  margin: 17px;
+  border-radius: 30px;
+  transition: all 0.3s ease;
 }

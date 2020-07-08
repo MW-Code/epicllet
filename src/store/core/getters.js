@@ -13,3 +13,10 @@ export function Wallet(state) {
 export function UserProfil(state) {
   return state.userProfil;
 }
+
+export function Mode(state) {
+  return state.mode;
+}
+export function IsDialog(state) {
+  return state.isDialog;
+}

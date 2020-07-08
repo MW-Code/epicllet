@@ -8,6 +8,9 @@ export default function() {
     accountsCollection: null,
     walletCollection: null,
 
+    isDialog: false,
+    mode: "Load",
+
     walletPointer: null,
     walletPool: [],
 
