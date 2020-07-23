@@ -8,12 +8,13 @@ export default function() {
     accountsCollection: null,
     walletCollection: null,
 
+    title: null,
     isDialog: false,
     mode: "Load",
 
     walletPointer: null,
     walletPool: [],
-
+    historyPool: [],
     userProfil: null
   };
 }

@@ -9,21 +9,14 @@
       enter-active-class="animated fadeIn"
       leave-active-class="animated fadeOut"
     >
-      <div v-show="wallet !== {}">
-        <p v-if="wallet !== {}" class=" text-accent text-center text-h4">
-          {{ wallet.title }}
+      <!-- <div v-show="Wallet !== {}">
+        <p
+          v-if="Wallet !== {}"
+          class="text-weight-light text-accent text-center text-h4"
+        >
+          {{ Wallet.title }}
         </p>
-        <!-- <q-input
-          v-show="wallet !== {}"
-          class=" q-my-md text-white"
-          style="margin: 17px;"
-          standout="bg-accent text-black"
-          v-model="query"
-          type="text"
-          dark
-          label="Suche"
-        /> -->
-      </div>
+      </div> -->
     </transition>
 
     <div>
@@ -34,7 +27,46 @@
         </section>
       </transition-group>
     </div>
-    <!-- <HistoryItem v-for="item in FilterWalletList" :key="item.id" /> -->
+    <div
+      style="bottom:0; position: fixed;
+      width: calc(100% - (17px*2) );
+     
+      border-radius: 30px 30px 0 0;
+      margin: 0px 17px 0 17px;"
+      :style="{ height: showFilter ? 'calc(100vh - 70px)' : '64px' }"
+      class="anima-all-ease-fast bg-accent q-px-md text-black row inline justify-center"
+    >
+      <div class="full-width" style="min-width: 315px;">
+        <q-input
+          v-show="wallet !== {}"
+          class=" text-white q-mx-md q-py-xs"
+          borderless
+          v-model="query"
+          type="text"
+          placeholder="Wallet durchsuchen"
+        >
+          <template v-slot:prepend>
+            <q-icon color="primary" v-if="query === ''" name="search" />
+            <q-icon
+              v-else
+              name="clear"
+              class="cursor-pointer"
+              @click="query = ''"
+            />
+          </template>
+          <template v-slot:append>
+            <q-btn
+              @click="showFilter = !showFilter"
+              class="q-ma-sm q-pa-sm"
+              flat
+              round
+              icon="sort"
+              dense
+            />
+          </template>
+        </q-input>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -48,7 +80,8 @@ export default {
     return {
       query: "",
       wallet: {},
-      historyPool: []
+      historyPool: [],
+      showFilter: false
     };
   },
   computed: {
@@ -59,30 +92,18 @@ export default {
       // console.log(this.$store.getters["WalletPool"]);
       return this.$store.getters["Wallet"];
     },
+    HistoryPool() {
+      return this.$store.getters["HistoryPool"];
+    },
     FilterWalletList() {
       var vm = this;
-      if (this.historyPool[0] === undefined) return;
-      return this.historyPool.filter(function(item) {
+      if (this.HistoryPool[0] === undefined) return;
+      return this.HistoryPool.filter(function(item) {
         return item.title.toLowerCase().indexOf(vm.query.toLowerCase()) !== -1;
       });
     }
   },
-  methods: {
-    LoadHistoryItems(walletID) {
-      this.historyPool = [
-        { title: "muh", id: "01" },
-        { title: "lol", id: "02" },
-        { title: "mäh", id: "03" }
-      ];
-    }
-    // UpdateWallet(newWallet) {
-    //   console.log("UpdateWallet in HistList", newWallet);
-    //   if (newWallet !== undefined) {
-    //     this.wallet = newWallet;
-    //     this.LoadHistoryItems(this.wallet.id);
-    //   }
-    // }
-  }
+  methods: {}
 };
 </script>
 
@@ -90,22 +111,27 @@ export default {
 .card {
   transition: all 0.5s;
 }
-.card-enter, .card-leave-to
-/* .card-leave-active for <2.1.8 */ {
+.card-enter,
+.card-leave-to {
   opacity: 0;
-  /* transform: scale(0); */
+  transition: all 0.1s;
+  transform: translateX(10px) scale(0);
 }
 .card-enter-to {
   opacity: 1;
-  /* transform: scale(1); */
+  transition: all 0.2s;
+  transform: translateX(-10px) scale(1);
 }
 
-/* .card-leave-active {
-  position: absolute;
-} */
+.card-leave-active {
+  opacity: 0;
+  transition: all 0.1s;
+  transform: translateX(10px) scale(0);
+}
 
 .card-move {
   opacity: 1;
   transition: all 0.5s;
+  transform: translateX(-10px);
 }
 </style>

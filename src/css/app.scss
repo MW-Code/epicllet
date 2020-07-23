@@ -1,6 +1,6 @@
 // app global css in SCSS form
 body {
-  background: $secondary;
+  background: $primary;
   // overflow: hidden;
 }
 
@@ -18,6 +18,13 @@ body {
 
 .anima-all-ease-slow {
   transition: all 1s ease;
+}
+
+.textellipsis {
+  white-space: nowrap;
+  width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .bg-animation {

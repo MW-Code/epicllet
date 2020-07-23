@@ -2,7 +2,7 @@
   <q-page class="flex flex-start">
     <!-- content -->
 
-    <WalletBalance style="height: calc(40vh - 50px) " ref="WalletBalance" />
+    <WalletBox style="height: calc(40vh - 50px) " ref="WalletBalance" />
     <WalletHistoryList
       v-if="Mode === 'Idle'"
       style="height: calc(60vh - 50px) "
@@ -12,13 +12,13 @@
 </template>
 
 <script>
-import WalletBalance from "../components/WalletBalance";
+import WalletBox from "../components/WalletBox";
 import WalletHistoryList from "../components/WalletHistoryList";
 
 export default {
   // name: 'PageName',
   components: {
-    WalletBalance,
+    WalletBox,
     WalletHistoryList
   },
   data() {

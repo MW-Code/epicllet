@@ -1,15 +1,37 @@
 <template>
   <q-layout view="lHh Lpr lFf">
-    <q-header elevated>
+    <q-header>
       <q-toolbar>
         <img
           class="q-pa-xs"
-          width="160px;"
-          src="../../src/assets/logos/epicllet.svg"
+          height="60px"
+          src="../../src/assets/logos/Logo White Header.svg"
         />
+        <q-space />
+        <!-- <img
+          v-if="Title === null"
+          class="q-pa-xs"
+          height="60px"
+          src="../../src/assets/logos/Logo White label.svg"
+        /> -->
+        <p
+          v-if="Title === null"
+          style="max-height:60px;"
+          class=" textellipsis text-weight-light text-white q-ma-md text-center text-h5 "
+        >
+          Epicllet
+        </p>
+        <p
+          style="max-height:60px;"
+          v-else
+          class="textellipsis text-weight-light text-white q-ma-md text-center text-h5 "
+        >
+          {{ Title }}
+        </p>
         <q-space />
         <q-btn
           v-if="IsDialog"
+          :disable="Wallet === null || Wallet === undefined"
           class="q-mx-xs"
           flat
           dense
@@ -35,7 +57,7 @@
       v-model="leftDrawerOpen"
       show-if-above
       side="right"
-      content-class="bg-secondary text-white"
+      content-class="bg-primary text-white"
     >
       <div v-if="UserProfil !== null && UserProfil !== undefined">
         <div
@@ -66,7 +88,7 @@
         <q-list class="q-pt-md" v-if="WalletPool.length > 0">
           <q-item-label
             header
-            class="q-my-none q-py-none text-h6  row justify-between items-center text-grey-8"
+            class="q-my-none q-py-none text-h6 text-grey-8 text-weight-light  row justify-between items-center "
           >
             Wallets
             <q-btn
@@ -86,13 +108,15 @@
             :key="wallet.id"
           >
             <q-item-section>
-              <q-item-label> {{ wallet.title }}</q-item-label>
+              <q-item-label class="textellipsis">
+                {{ wallet.title }}</q-item-label
+              >
               <q-item-label v-if="wallet.info !== ''" caption lines="1">{{
                 wallet.info
               }}</q-item-label>
             </q-item-section>
             <q-item-section avatar>
-              4k €
+              {{ GetBalanceString(wallet.balance) }} {{ wallet.currency }}
               <!-- <q-icon name="chat_bubble" color="primary" /> -->
             </q-item-section>
           </q-item>
@@ -130,6 +154,9 @@ export default {
     IsDialog() {
       return this.$store.getters["IsDialog"];
     },
+    Title() {
+      return this.$store.getters["Title"];
+    },
     Wallet() {
       return this.$store.getters["Wallet"];
     },
@@ -141,6 +168,19 @@ export default {
     }
   },
   methods: {
+    GetBalanceString(balanceString) {
+      const units = ["k", "M", "B"];
+      let decimal;
+
+      for (var i = units.length - 1; i >= 0; i--) {
+        decimal = Math.pow(1000, i + 1);
+
+        if (balanceString <= -decimal || balanceString >= decimal) {
+          return +(balanceString / decimal).toFixed(2) + units[i];
+        }
+      }
+      return balanceString;
+    },
     CloseDialog() {
       this.$store.commit("UpdateMode", "Idle");
     },
@@ -153,8 +193,9 @@ export default {
     },
     OpenWallet(id) {
       if (this.Wallet.id !== id) {
+        this.$store.commit("ClearHistory");
         this.$store.commit("SelectWallet", id);
-
+        this.$store.dispatch("LoadWalletHistory", id);
         this.leftDrawerOpen = false;
       }
     }

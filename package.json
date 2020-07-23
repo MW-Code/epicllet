@@ -14,11 +14,11 @@
     "axios": "^0.18.1",
     "core-js": "^3.6.5",
     "firebase": "^7.15.5",
-    "quasar": "^1.0.0",
+    "quasar": "^1.12.11",
     "vue-i18n": "^8.0.0"
   },
   "devDependencies": {
-    "@quasar/app": "^2.0.0",
+    "@quasar/app": "^2.0.5",
     "babel-eslint": "^10.0.1",
     "eslint": "^6.8.0",
     "eslint-config-prettier": "^6.9.0",

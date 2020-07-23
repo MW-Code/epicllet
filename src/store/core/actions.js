@@ -113,20 +113,12 @@ export const SaveUserProfil = ({ commit }, payload) => {
       usermail: payload.usermail,
       newsletter: payload.newsletter
     })
-    // .then(() => {
-    //   commit("UpdateUserProfil", {
-    //     username: payload.username,
-    //     usermail: payload.usermail,
-    //     newsletter: payload.newsletter,
-    //     uid: payload.uid
-    //   });
-    // })
     .catch(err => {
       console.log(err);
     });
 };
 
-export const WalletLoad = ({ commit }) => {
+export const WalletLoad = ({ commit, dispatch }) => {
   const uid = auth.currentUser.uid;
   console.log("START WALLET LOAD", uid);
 
@@ -147,11 +139,55 @@ export const WalletLoad = ({ commit }) => {
         };
 
         commit("AddWallet", walletObj);
-        commit("SelectWallet", doc.id);
-        commit("UpdateMode", "Idle");
       });
+      commit("SelectWallet");
+      dispatch("LoadWalletHistory");
+      commit("UpdateMode", "Idle");
     }
   });
+};
+
+export const LoadWalletHistory = ({ commit, state }, id) => {
+  let walletId;
+  commit("ClearHistory");
+  if (id === undefined) {
+    // walletId = state.walletPool[].id;
+    walletId = state.walletPool[state.walletPointer].id;
+    console.log("WalletID");
+  } else {
+    walletId = id;
+  }
+  walletCollection
+    .doc(walletId)
+    .collection("history")
+    .get()
+    .then(snapshot => {
+      // commit("ClearHistory");
+      if (!snapshot.empty) {
+        // keine Wallets gefunden
+        console.log("History von ", walletId);
+
+        snapshot.forEach(doc => {
+          const historyObj = {
+            id: doc.id,
+            ...doc.data()
+          };
+          commit("AddHistory", historyObj);
+          console.log("add this History Objekt,", historyObj);
+        });
+      }
+    });
+};
+
+export const SaveWalletHistory = ({ commit, dispatch }, payload) => {
+  walletCollection
+    .doc(payload.id)
+    .collection("history")
+    .add(payload.historyObj)
+    .then(resHistory => {
+      // console.log("Anlegen des Wallets Fertig", resHistory);
+      dispatch("LoadWalletHistory", payload.id);
+    });
 };
 
 export const WalletSave = ({ dispatch, commit }, payload) => {
@@ -175,13 +211,7 @@ export const WalletSave = ({ dispatch, commit }, payload) => {
       info: "Wallet wurde erfolgreich erstellt.",
       timestamp: new Date()
     };
-    walletCollection
-      .doc(resWallet.id)
-      .collection("history")
-      .add(historyObj)
-      .then(resHistory => {
-        // console.log("Anlegen des Wallets Fertig", resHistory);
-        dispatch("WalletLoad");
-      });
+    dispatch("SaveWalletHistory", { id: resWallet.id, historyObj });
+    dispatch("WalletLoad");
   });
 };

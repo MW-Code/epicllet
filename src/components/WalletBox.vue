@@ -1,10 +1,10 @@
 <template>
   <div
     class=" anima-all-ease-fast bg-animation text-secondary row items-center justify-center"
-    style=" width:100%;"
+    style=" min-height: 150px; width:100%;"
     :class="{
-      newWalletBG: Mode === 'AddWallet',
-      rounded: Mode !== 'AddWallet'
+      newWalletBG: IsDialog,
+      rounded: !IsDialog
     }"
   >
     <WalletBtn ref="WalletBtnDialog" @SaveWallet="SaveWallet" />
@@ -14,7 +14,7 @@
 <script>
 import WalletBtn from "./WalletBTNDialog";
 export default {
-  // name: 'ComponentName',
+  name: "WalletBox",
   // props: ["WalletPool"],
   components: {
     WalletBtn
@@ -27,36 +27,16 @@ export default {
   },
   methods: {
     SetupWalletBtn() {
-      // this.$store.commit("UpdateMode", "Load");
-      // this.fsBG = false;
-
       if (this.Wallet === null || this.Wallet === undefined) {
         console.log("WALLET nicht GEFUNDEN", this.Wallet);
-        setTimeout(() => {
-          // this.$store.commit("UpdateMode", "AddWallet");
-          // this.fsBG = true;
-          setTimeout(() => {
-            if (this.$refs.WalletBtnDialog !== undefined)
-              this.$refs.WalletBtnDialog.ShowNewWalletDialog();
-          }, 400);
-        }, 500);
+        this.$store.commit("UpdateMode", "AddWallet");
       } else {
         console.log("WALLET GEFUNDEN", this.Wallet);
         this.$store.commit("UpdateMode", "Idle");
       }
     },
-    // UpdateWallet(newWallet) {
-    //   console.log("UpdateWallet in Balance", newWallet, this.mode);
-    //   this.wallet = newWallet;
-    //   this.SetupWalletBtn();
-    // },
     SaveWallet(payload) {
       console.log("Save Wallet Emit", payload);
-
-      this.$refs.WalletBtnDialog.HideNewWalletDialog();
-
-      // this.fsBG = false;
-      // this.addwallet = false;
       this.$store
         .dispatch("WalletSave", {
           title: payload.title,
@@ -67,18 +47,16 @@ export default {
           console.log("then WalletSave", res);
         });
     }
-    // ShowNewWallet() {
-    //   this.addwallet = !this.addwallet;
-    //   this.fsBG = !this.fsBG;
-    // }
   },
   computed: {
     Wallet() {
-      // console.log(this.$store.getters["WalletPool"]);
       return this.$store.getters["Wallet"];
     },
     Mode() {
       return this.$store.getters["Mode"];
+    },
+    IsDialog() {
+      return this.$store.getters["IsDialog"];
     }
   }
 };

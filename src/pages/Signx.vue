@@ -1,13 +1,13 @@
 <template>
-  <q-page class="fullPage bg-secondary no-border text-white  ">
+  <q-page class="fullPage bg-primary no-border text-white  ">
     <div
-      class="rounded bg-animation text-secondary row items-center justify-center"
+      class="rounded bg-animation text-primary row items-center justify-center"
       style="height: 25vh"
     >
       <q-btn
         round
         flat
-        class="anima-all-1s-ease no-pointer-events shadow-10 bg-secondary text-white q-ma-md  text-weight-light text-h4"
+        class="anima-all-1s-ease no-pointer-events shadow-10 bg-primary text-white q-ma-md  text-weight-light text-h4"
         :icon="iconState"
         :ripple="false"
       />
@@ -19,7 +19,7 @@
       keep-alive
       v-model="tabState"
       animated
-      class="bg-secondary no-border text-white"
+      class="bg-primary no-border text-white"
     >
       <q-tab-panel style="overflow: hidden;" name="signin">
         <div class="text-h4 text-accent text-center">

@@ -2,10 +2,11 @@
   <div
     class="text-nowarp  base anima-all-ease-fast shadow-10 text-weight-light text-h4 q-pa-lg row justify-center items-center"
     :class="{
-      roundedBTN: Mode === 'AddWallet',
-      dialogWallet: Mode === 'AddWallet'
+      roundedBTN: IsDialog,
+      dialogWallet: IsDialog
     }"
     :style="[btnStyleHandler]"
+    @click.self="OpenInputDialog()"
   >
     <div class="anima-all-ease" :class="{ titlelabel: Mode === 'AddWallet' }">
       <q-spinner-grid v-if="Mode === 'Load'" />
@@ -17,18 +18,28 @@
           leave-active-class="animated fadeOut"
         >
           <p
+            @click.self="OpenInputDialog()"
             v-show="showLabel"
             v-if="BuildLabelText() !== ''"
-            class=" q-ma-none q-pa-none"
+            class="q-ma-none q-pa-none"
           >
             {{ BuildLabelText() }}
           </p>
         </transition>
       </div>
     </div>
+    <transition
+      v-if="Mode === 'UpdateInput'"
+      appear
+      enter-active-class="animated fadeIn"
+      leave-active-class="animated
+      fadeOut"
+    >
+      <p class="text-white">hallo</p>
+    </transition>
     <!-- <div > -->
     <transition
-      v-if="newWalletDialog.dialogContent"
+      v-if="Mode === 'AddWallet'"
       appear
       enter-active-class="animated fadeIn"
       leave-active-class="animated
@@ -70,8 +81,9 @@
             type="submit"
           />
           <q-btn
+            :disable="Wallet === null || Wallet === undefined"
             flat
-            @click="Cancel()"
+            @click.native="CancelAddWallet()"
             class="full-width q-mt-md text-white"
             size="md"
             label="Abbrechen"
@@ -96,38 +108,21 @@ export default {
         maxWidth: "280px"
       },
       newWallet: {
-        title: "Mein Konto",
+        title: "Epic Wallet",
         info: "",
         currency: "€"
-      },
-
-      newWalletDialog: {
-        // showDialog: false,
-        // headerRdy: false,
-        dialogContent: false // dialogRdy: this.Mode === "AddWallet" ? true : false
       }
     };
   },
-  watcher: {
-    Mode(n, o) {
-      console.log("watchers", n, o);
-    }
-  },
   methods: {
-    // GetDialogContent() {
-    //   return this.Mode === "AddWallet"
-    //     ? setTimeout(() => {
-    //         return true;
-    //       }, 100)
-    //     : setTimeout(() => {
-    //         return false;
-    //       }, 100);
-    // },
-    Cancel() {
-      // this.newWalletDialog.headerRdy = false;
-      this.newWalletDialog.dialogRdy = false;
-      // this.newWalletDialog.showDialog = false;
+    CancelAddWallet() {
       this.$store.commit("UpdateMode", "Idle");
+    },
+    OpenInputDialog() {
+      if (this.Mode === "Idle") {
+        console.log("Open Input Dialog");
+        this.$store.commit("UpdateMode", "UpdateInput");
+      }
     },
     EmitSaveWallet() {
       this.$emit("SaveWallet", {
@@ -135,20 +130,6 @@ export default {
         currency: this.newWallet.currency,
         info: this.newWallet.info
       });
-    },
-    ShowNewWalletDialog() {
-      // // this.newWalletDialog.showDialog = true;
-      // setTimeout(() => {
-      //   // this.newWalletDialog.headerRdy = true;
-      setTimeout(() => {
-        this.newWalletDialog.dialogRdy = true;
-      }, 400);
-      // }, 100);
-    },
-    HideNewWalletDialog() {
-      this.newWalletDialog.headerRdy = false;
-      this.newWalletDialog.dialogRdy = false;
-      this.newWalletDialog.showDialog = false;
     },
     BuildIcon() {
       if (this.Mode === "add") return "add";
@@ -160,7 +141,6 @@ export default {
     BuildLabelText() {
       if (this.Mode === "AddWallet") {
         setTimeout(() => {
-          this.ShowNewWalletDialog();
           this.showLabel = true;
         }, 200);
         return "Wallet";
@@ -186,21 +166,33 @@ export default {
     }
   },
   computed: {
+    IsDialog() {
+      return this.$store.getters["IsDialog"];
+    },
     Mode() {
       return this.$store.getters["Mode"];
     },
+    WalletPool() {
+      return this.$store.getters["WalletPool"];
+    },
     Wallet() {
-      // console.log(this.$store.getters["WalletPool"]);
       return this.$store.getters["Wallet"];
     }
   }
+  // mounted() {
+  //   this.$nextTick(() => {
+  //     console.log("Mount BTN Dialog", this.WalletPool);
+
+  //     this.newWallet.title = "Wallet " + (this.WalletPool.length + 1);
+  //   });
+  // }
 };
 </script>
 
 <style lang="scss">
 .base {
   color: white;
-  background: $secondary;
+  background: $primary;
   min-width: 100px;
   min-height: 100px;
   border-radius: 50px;

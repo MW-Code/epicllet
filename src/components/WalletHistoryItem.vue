@@ -1,6 +1,9 @@
 <template>
-  <div class="text-white bg-primary shadow-1 q-pa-md rounded">
-    <p class="text-h6 text-weight-light">{{ HistoryItem.title }}</p>
+  <div
+    class=" shadow-1 q-pa-sm rounded"
+    :style="{ 'background-color': bgColor, color: textColor }"
+  >
+    <p class="text-h6 text-weight-light q-ma-md">{{ HistoryItem.title }}</p>
   </div>
 </template>
 
@@ -9,7 +12,14 @@ export default {
   name: "HistoryItem",
   props: ["HistoryItem"],
   data() {
-    return {};
+    return {
+      bgColor: "var(--q-color-secondary)",
+      textColor: "var(--q-color-primary)"
+    };
+  },
+  mounted() {
+    this.bgColor = "var(--q-color-secondary)";
+    this.textColor = "white";
   }
 };
 </script>
